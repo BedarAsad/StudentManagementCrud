@@ -7,7 +7,7 @@
     </button>
     <div class="bg-white p-8 rounded shadow text-center w-full max-w-md">
       <h2 class="text-2xl font-bold mb-4 text-green-600">
-        {{ isEditMode ? 'Edit Student' : 'Add Student' }}
+        {{ isEditMode ? "Edit Student" : "Add Student" }}
       </h2>
       <form @submit.prevent="handleSubmit">
         <div class="mb-4 text-left">
@@ -26,7 +26,7 @@
         </div>
         <button type="submit"
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer w-full">
-          {{ isEditMode ? 'Update Student' : 'Add Student' }}
+          {{ isEditMode ? "Update Student" : "Add Student" }}
         </button>
         <div v-if="message" class="mt-4 text-green-600">
           {{ message }}
@@ -113,7 +113,11 @@ async function handleSubmit() {
       setTimeout(() => router.push("/homepage"), 1000);
     } else {
       const err = await response.json();
-      error.value = err.message || (isEditMode.value ? "Failed to update student." : "Failed to add student.");
+      error.value =
+        err.message ||
+        (isEditMode.value
+          ? "Failed to update student."
+          : "Failed to add student.");
     }
   } catch (e) {
     error.value = isEditMode.value
