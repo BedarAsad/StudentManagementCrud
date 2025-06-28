@@ -1,19 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\Student;
+use App\Http\Controllers\StudentController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('/students', [App\Http\Controllers\StudentController::class, 'addStudent']);
-
-// student list route
-Route::get('/students', function () {
-    return Student::all();
-});
-Route::delete('/students/{id}', function ($id) {
-    \App\Models\Student::findOrFail($id)->delete();
-    return response()->json(['message' => 'Student deleted successfully']);
-});
+// Student Management Routes
+Route::post('/students', [StudentController::class, 'addStudent']);
+Route::get('/students', [StudentController::class, 'listStudents']);
+Route::get('/students/{student}', [StudentController::class, 'getStudent']);
+Route::delete('/students/{student}', [StudentController::class, 'deleteStudent']);
+Route::put('/students/{student}', [StudentController::class, 'updateStudent']);
