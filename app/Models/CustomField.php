@@ -10,4 +10,9 @@ class CustomField extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'data_type', 'required'];
+
+    public function studentValues()
+    {
+        return $this->hasMany(StudentCustomFieldValue::class);
+    }
 }

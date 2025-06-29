@@ -13,4 +13,9 @@ class Student extends Model
         'name',
         'contact_number',
     ];
+
+    public function customFieldValues()
+    {
+        return $this->hasMany(StudentCustomFieldValue::class);
+    }
 }

@@ -29,6 +29,9 @@
                     <th class="px-4 py-2 border-b text-left">#</th>
                     <th class="px-4 py-2 border-b text-left">Name</th>
                     <th class="px-4 py-2 border-b text-left">Contact Number</th>
+                    <th v-for="field in customFields" :key="field.id" class="px-4 py-2 border-b text-left">
+                        {{ field.name }}
+                    </th>
                     <th class="px-4 py-2 border-b text-left">Action</th>
                 </tr>
             </thead>
@@ -37,6 +40,9 @@
                     <td class="px-4 py-2 border-b">{{ idx + 1 }}</td>
                     <td class="px-4 py-2 border-b">{{ student.name }}</td>
                     <td class="px-4 py-2 border-b">{{ student.contact_number }}</td>
+                    <td v-for="field in customFields" :key="field.id" class="px-4 py-2 border-b">
+                        {{ student.custom_fields?.[field.id] ?? '-' }}
+                    </td>
                     <td class="px-4 py-2 border-b flex gap-2">
                         <!-- Edit Icon -->
                         <button @click="editStudent(student)" class="text-blue-500 hover:text-blue-700 cursor-pointer"
@@ -70,6 +76,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter();
 
 const students = ref([]);
+const customFields = ref([]);
 const loading = ref(true);
 
 function goToConfigure() {
@@ -77,6 +84,17 @@ function goToConfigure() {
 }
 function goToAdd() {
     router.push('/add-student');
+}
+
+async function fetchCustomFields() {
+    try {
+        const res = await fetch('/custom-fields');
+        if (res.ok) {
+            customFields.value = await res.json();
+        }
+    } catch (e) {
+        customFields.value = [];
+    }
 }
 
 async function fetchStudents() {
@@ -116,5 +134,8 @@ async function deleteStudent(id) {
     }
 }
 
-onMounted(fetchStudents);
+onMounted(async () => {
+    await fetchCustomFields();
+    await fetchStudents();
+});
 </script>

@@ -10,7 +10,7 @@
         <div class="w-full max-w-2xl">
             <!-- Add Custom Field Section -->
             <div class="bg-white p-8 rounded shadow text-center mb-8">
-                <h2 class="text-2xl font-bold mb-4 text-blue-600">Add New Custom Field</h2>
+                <h2 class="text-2xl font-bold mb-4 text-blue-600">{{ editId ? 'Update Custom Field' : 'Add New Custom Field' }}</h2>
                 <form @submit.prevent="addCustomField" class="flex flex-col md:flex-row gap-4 mb-4 items-end justify-center">
                     <div class="w-full md:w-1/2">
                         <label class="block mb-1 font-medium text-gray-700">Field Name <span class="text-red-500">*</span></label>
@@ -27,7 +27,7 @@
                         </select>
                     </div>
                     <div class="w-full md:w-1/2">
-                        <label class="block mb-1 font-medium text-gray-700">Required</label>
+                        <label class="block mb-5 font-medium text-gray-700">Required</label>
                         <input v-model="form.required" type="checkbox" class="form-checkbox w-full border border-gray-300 rounded px-3 py-2" />
                     </div>
                     <button type="submit"

@@ -24,6 +24,23 @@
           <input v-model="form.contact_number" type="text"
             class="form-input w-full border border-gray-300 rounded px-3 py-2" required />
         </div>
+        <!-- Custom Fields -->
+        <div
+          v-for="field in customFields"
+          :key="field.id"
+          class="mb-4 text-left"
+        >
+          <label class="block mb-1 font-medium text-gray-700">
+            {{ field.name }}
+            <span v-if="field.required" class="text-red-500">*</span>
+          </label>
+          <input
+            v-model="form.custom_fields[field.id]"
+            :type="field.data_type === 'number' ? 'number' : 'text'"
+            class="form-input w-full border border-gray-300 rounded px-3 py-2"
+            :required="field.required"
+          />
+        </div>
         <button type="submit"
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer w-full">
           {{ isEditMode ? "Update Student" : "Add Student" }}
@@ -43,13 +60,25 @@ import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 
-const form = ref({ name: "", contact_number: "" });
+const form = ref({ name: "", contact_number: "", custom_fields: {} });
 const message = ref("");
 const error = ref("");
 const isEditMode = ref(false);
+const customFields = ref([]);
 
 function goToHome() {
   router.push("/homepage");
+}
+
+async function fetchCustomFields() {
+  try {
+    const res = await fetch("/custom-fields");
+    if (res.ok) {
+      customFields.value = await res.json();
+    }
+  } catch (e) {
+    customFields.value = [];
+  }
 }
 
 async function fetchStudent(id) {
@@ -57,10 +86,10 @@ async function fetchStudent(id) {
     const response = await fetch(`/students/${id}`);
     if (response.ok) {
       const data = await response.json();
-      console.log("Fetched student data:", data);
       form.value = {
         name: data.name,
         contact_number: data.contact_number,
+        custom_fields: { ...data.custom_fields }
       };
       isEditMode.value = true;
     } else {
@@ -74,10 +103,20 @@ async function fetchStudent(id) {
 async function handleSubmit() {
   message.value = "";
   error.value = "";
+
+  // Convert all custom field values to strings
+  const customFieldsString = {};
+  for (const [key, val] of Object.entries(form.value.custom_fields)) {
+    customFieldsString[key] = val !== null && val !== undefined ? String(val) : "";
+  }
+  const submitForm = {
+    ...form.value,
+    custom_fields: customFieldsString
+  };
+
   try {
     let response;
     if (isEditMode.value && route.query.id) {
-      // Edit mode: update student
       response = await fetch(`/students/${route.query.id}`, {
         method: "PUT",
         headers: {
@@ -88,10 +127,9 @@ async function handleSubmit() {
               .querySelector("meta[name=csrf-token]")
               ?.getAttribute("content") || "",
         },
-        body: JSON.stringify(form.value),
+        body: JSON.stringify(submitForm),
       });
     } else {
-      // Add mode: create student
       response = await fetch("/students", {
         method: "POST",
         headers: {
@@ -102,14 +140,14 @@ async function handleSubmit() {
               .querySelector("meta[name=csrf-token]")
               ?.getAttribute("content") || "",
         },
-        body: JSON.stringify(form.value),
+        body: JSON.stringify(submitForm),
       });
     }
     if (response.ok) {
       message.value = isEditMode.value
         ? "Student updated successfully!"
         : "Student added successfully!";
-      form.value = { name: "", contact_number: "" };
+      form.value = { name: "", contact_number: "", custom_fields: {} };
       setTimeout(() => router.push("/homepage"), 1000);
     } else {
       const err = await response.json();
@@ -126,9 +164,14 @@ async function handleSubmit() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchCustomFields();
   if (route.query.id) {
-    fetchStudent(route.query.id);
+    await fetchStudent(route.query.id);
   }
 });
 </script>
+
+<style scoped>
+/* Add any component-specific styles here */
+</style>
