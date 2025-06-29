@@ -26,6 +26,10 @@
                             <option value="boolean">Boolean</option>
                         </select>
                     </div>
+                    <div class="w-full md:w-1/2">
+                        <label class="block mb-1 font-medium text-gray-700">Required</label>
+                        <input v-model="form.required" type="checkbox" class="form-checkbox w-full border border-gray-300 rounded px-3 py-2" />
+                    </div>
                     <button type="submit"
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer min-w-[100px]">
                         {{ editId ? 'Update' : 'Add' }}
@@ -44,6 +48,7 @@
                             <th class="px-4 py-2 border-b text-left">#</th>
                             <th class="px-4 py-2 border-b text-left">Name</th>
                             <th class="px-4 py-2 border-b text-left">Data Type</th>
+                            <th class="px-4 py-2 border-b text-left">Required</th>
                             <th class="px-4 py-2 border-b text-left">Action</th>
                         </tr>
                     </thead>
@@ -52,6 +57,9 @@
                             <td class="px-4 py-2 border-b">{{ idx + 1 }}</td>
                             <td class="px-4 py-2 border-b">{{ field.name }}</td>
                             <td class="px-4 py-2 border-b">{{ field.data_type }}</td>
+                            <td class="px-4 py-2 border-b text-center">
+                                <input type="checkbox" :checked="field.required" disabled />
+                            </td>
                             <td class="px-4 py-2 border-b flex gap-2 justify-center">
                                 <button @click="editField(field)" class="text-blue-500 hover:text-blue-700 cursor-pointer" title="Edit">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none"
@@ -70,7 +78,7 @@
                             </td>
                         </tr>
                         <tr v-if="!customFields.length">
-                            <td colspan="4" class="py-4 text-gray-500">No custom fields found.</td>
+                            <td colspan="5" class="py-4 text-gray-500">No custom fields found.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -85,7 +93,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter();
 
 const customFields = ref([]);
-const form = ref({ name: '', data_type: '' });
+const form = ref({ name: '', data_type: '', required: false });
 const editId = ref(null);
 const message = ref('');
 const error = ref('');
@@ -122,7 +130,7 @@ async function addCustomField() {
         });
         if (res.ok) {
             message.value = editId.value ? 'Custom field updated!' : 'Custom field added!';
-            form.value = { name: '', data_type: '' };
+            form.value = { name: '', data_type: '', required: false }; 
             editId.value = null;
             await fetchCustomFields();
         } else {
@@ -135,7 +143,7 @@ async function addCustomField() {
 }
 
 function editField(field) {
-    form.value = { name: field.name, data_type: field.data_type };
+    form.value = { name: field.name, data_type: field.data_type, required: field.required };
     editId.value = field.id;
     message.value = '';
     error.value = '';

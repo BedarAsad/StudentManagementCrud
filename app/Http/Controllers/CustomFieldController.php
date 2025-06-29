@@ -17,8 +17,13 @@ class CustomFieldController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'data_type' => 'required|string|max:50',
+            'required' => 'sometimes|boolean',
         ]);
-        $field = CustomField::create($validated);
+        $field = CustomField::create([
+            'name' => $validated['name'],
+            'data_type' => $validated['data_type'],
+            'required' => $request->boolean('required'),
+        ]);
         return response()->json($field, 201);
     }
 
@@ -27,8 +32,13 @@ class CustomFieldController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'data_type' => 'required|string|max:50',
+            'required' => 'sometimes|boolean',
         ]);
-        $customField->update($validated);
+        $customField->update([
+            'name' => $validated['name'],
+            'data_type' => $validated['data_type'],
+            'required' => $request->boolean('required'),
+        ]);
         return response()->json($customField);
     }
 

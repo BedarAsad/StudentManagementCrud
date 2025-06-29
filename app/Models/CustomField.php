@@ -9,5 +9,5 @@ class CustomField extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'data_type'];
+    protected $fillable = ['name', 'data_type', 'required'];
 }
